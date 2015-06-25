@@ -516,41 +516,45 @@ function getSegments(code, lines, count, statementDetails) {
         return (a.start - b.start);
     });
     var combined = [splintered[0]];
-    splintered.reduce(function(p, c) {
-        if (p && p.start <= c.start && p.end >= c.end &&
-            (p.count === c.count || (p.count && c.count))) {
-            // Can get rid of c
-            return p;
-        } else {
-            combined.push(c);
-            return c;
-        }
-    });
-    // combine adjacent segments
-    currentItem = {
-        start: combined[0].start,
-        end: combined[0].end,
-        count: combined[0].count
-    };
-    segments = [];
-    combined.splice(0,1);
-    combined.forEach(function(item) {
-        if (item.count === currentItem.count || (item.count && currentItem.count)) {
-            currentItem.end = item.end;
-        } else {
-            segments.push(currentItem);
-            currentItem = {
-                start: item.start,
-                end: item.end,
-                count: item.count
-            };
-        }
-    });
-    segments.push(currentItem);
-    // Now add the code to each segment
-    segments.forEach(function(item) {
-        item.code = linesCode.substring(item.start, item.end);
-    });
+    if (splintered.length) {
+        splintered.reduce(function (p, c) {
+            if (p && p.start <= c.start && p.end >= c.end &&
+                (p.count === c.count || (p.count && c.count))) {
+                // Can get rid of c
+                return p;
+            } else {
+                combined.push(c);
+                return c;
+            }
+        });
+        // combine adjacent segments
+        currentItem = {
+            start: combined[0].start,
+            end: combined[0].end,
+            count: combined[0].count
+        };
+        segments = [];
+        combined.splice(0, 1);
+        combined.forEach(function (item) {
+            if (item.count === currentItem.count || (item.count && currentItem.count)) {
+                currentItem.end = item.end;
+            } else {
+                segments.push(currentItem);
+                currentItem = {
+                    start: item.start,
+                    end: item.end,
+                    count: item.count
+                };
+            }
+        });
+        segments.push(currentItem);
+        // Now add the code to each segment
+        segments.forEach(function (item) {
+            item.code = linesCode.substring(item.start, item.end);
+        });
+    } else {
+        segments = [];
+    }
     return segments;
 }
 
